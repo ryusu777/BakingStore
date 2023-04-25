@@ -1,0 +1,36 @@
+﻿@inject IUOMRepository Repository;
+@inject ToastService toast;
+@page "/"
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<Select T="UOM" Options="page.Data" OptionLabel="optionLabel" Label="Choose UOM" @bind-Selected="selected"></Select>
+
+@code {
+    private Form form;
+    PageResult<UOM> page = new PageResult<UOM>();
+    private FormConstants formMode = FormConstants.Create;
+    private Func<UOM, string> optionLabel = (e) => e.UomCode + " - " + e.UomDesc;
+    private UOM selected;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Fetch();
+    }
+
+    public async Task Fetch()
+    {
+        try
+        {
+            page = await Repository.FetchPageAsync(new PageRequest<UOM>());
+        } 
+        catch (Exception e)
+        {
+            toast.NotifyFailedAsync("Failed on fetching data: " + e.Message);
+        }
+    }
+}

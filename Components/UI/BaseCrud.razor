@@ -1,0 +1,125 @@
+﻿@inject ToastService toast;
+@typeparam T where T : new()
+
+@PageTitle
+
+<button class="btn-primary" @onclick="() => OnCreate()">Add</button>
+<Form OnSubmit="OnSubmit" @bind-Show="showDialog" OnCancel="() => input = Activator.CreateInstance<T>()" @ref="form">
+    @Form(input)
+</Form>
+<DeleteDialog @bind-Show="showDeleteDialog" OnSubmit="() => DeleteAsync()" DialogTitle="Delete UOM"></DeleteDialog>
+
+@ListView(page.Data)
+
+@code {
+    [Parameter]
+    public RenderFragment PageTitle { get; set; }
+
+    [Parameter]
+    public RenderFragment<ICollection<T>> ListView { get; set; }
+
+    [Parameter]
+    public RenderFragment<T> Form { get; set; }
+
+    [Parameter]
+    public ICrudService<T> Repository { get; set; }
+
+    private Form form;
+    PageResult<T> page = new PageResult<T>();
+    private T input;
+    private T toDelete;
+    private bool showDialog = false;
+    private bool showDeleteDialog = false;
+    private FormConstants formMode = FormConstants.Create;
+
+    protected override async Task OnInitializedAsync()
+    {
+        input = Activator.CreateInstance<T>();
+        await Fetch();
+    }
+
+    public void OnCreate()
+    {
+        formMode = FormConstants.Create;
+        showDialog = true;
+    }
+    public void OnEdit(T e)
+    {
+        formMode = FormConstants.Edit;
+        input = e;
+        showDialog = true;
+    }
+
+    public async Task Fetch()
+    {
+        try
+        {
+            page = await Repository.FetchPageAsync(new PageRequest<T>());
+        } 
+        catch (Exception e)
+        {
+            toast.NotifyFailedAsync("Failed on fetching data: " + e.Message);
+        }
+    }
+
+    public void OnDelete(T e)
+    {
+        toDelete = e;
+        showDeleteDialog = true;
+    }
+
+    public async Task DeleteAsync()
+    {
+        try
+        {
+            await Repository.DeleteAsync(toDelete);
+            toast.NotifySucessAsync("Successfully deleted data");
+        } 
+        catch (Exception e) 
+        {
+            toast.NotifyFailedAsync("Failed to delete: " + e.Message);
+        }
+
+        await Fetch();
+        showDeleteDialog = false;
+    }
+
+    public async Task OnSubmit()
+    {
+        if (formMode == FormConstants.Create)
+            await AddAsync();
+        else if (formMode == FormConstants.Edit)
+            await EditAsync();
+
+        input = Activator.CreateInstance<T>();
+        await form.Hide();
+    }
+
+    public async Task EditAsync()
+    {
+        try 
+        {
+            await Repository.UpdateAsync(input);
+            toast.NotifySucessAsync("Successfully edited data");
+        }
+        catch (Exception e)
+        {
+            toast.NotifyFailedAsync("Failed to edit: " + e.Message);
+        }
+        await Fetch();
+    }
+
+    public async Task AddAsync()
+    {
+        try 
+        {
+            await Repository.AddAsync(input);
+            toast.NotifySucessAsync("Successfully added data");
+        }
+        catch (Exception e)
+        {
+            toast.NotifyFailedAsync("Failed to add: " + e.Message);
+        }
+        await Fetch();
+    }
+}

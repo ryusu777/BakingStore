@@ -1,0 +1,52 @@
+﻿@page "/uom"
+@inject IUOMRepository repository;
+@inject ToastService toastService;
+
+<BaseCrud T="UOM" @ref="baseCrud" Repository="repository">
+    <PageTitle>
+		<h3>Unit Of Measurements</h3>
+    </PageTitle>
+    <Form Context="input">
+		<div class="flex flex-col">
+			<label>UOM Code</label>
+			<input @bind="input.UomCode" />
+		</div>
+		<div class="flex flex-col">
+			<label>UOM Desc</label>
+			<input @bind="input.UomDesc" />
+		</div>
+    </Form>
+
+    <ListView Context="items">
+		<table class="table-auto table-primary">
+			<thead>
+				<tr>
+					<th>UOM Code</th>
+					<th>UOM Desc</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (UOM item in items)
+				{
+					<tr>
+						<td>@item.UomCode</td>
+						<td>@item.UomDesc</td>
+						<td class="flex gap-x-1">
+							<button class="btn-primary" @onclick="() => baseCrud.OnEdit(item)">
+								Edit
+							</button>
+							<button class="btn-danger" @onclick="() => baseCrud.OnDelete(item)">
+								Delete
+							</button>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+    </ListView>
+</BaseCrud>
+
+@code {
+	private BaseCrud<UOM> baseCrud;
+}

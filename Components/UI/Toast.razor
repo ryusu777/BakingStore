@@ -1,0 +1,48 @@
+﻿@if(show) 
+{
+	<div class="
+        @(animateIn ? "toast-in" : "toast-out") 
+        @(Result == ToastResult.Failed
+            ? "bg-rose-400 text-rose-700"
+            : Result == ToastResult.Warning
+			? "bg-amber-400 text-amber-700"
+			: "bg-emerald-400 text-emerald-700"
+        )
+        fixed flex items-center w-full max-w-xs p-4 space-x-4 divide-x divide-gray-200 rounded-lg shadow right-5 bottom-5 space-x" role="alert">
+		<div class="text-md font-bold">@Message</div>
+	</div>
+}
+
+<style>
+</style>
+
+@code {
+    public string Message { get; set; }
+    public ToastResult Result { get; set; }
+    private bool show = false;
+    private bool animateIn = true;
+    private void InvokeShow()
+    {
+        show = true;
+        animateIn = true;
+        StateHasChanged();
+    }
+    private async Task InvokeHide() 
+    {
+        animateIn = false;
+        StateHasChanged();
+
+        await Task.Delay(500);
+
+        show = false;
+        StateHasChanged();
+    }
+    public void Show()
+    {
+        InvokeAsync(InvokeShow);
+    }
+    public async Task Hide()
+    {
+        await InvokeAsync(InvokeHide);
+    }
+}

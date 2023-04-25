@@ -1,0 +1,6 @@
+bin/
+obj/
+wwwroot/css/app.css
+BakingStore.csproj.user
+BakingStore.sln
+.vs/

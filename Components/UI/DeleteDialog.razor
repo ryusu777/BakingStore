@@ -1,0 +1,46 @@
+﻿@if (Show)
+{
+	<div 
+		class=" 
+			absolute 
+			top-0 
+			left-0 
+			z-[1] 
+			h-full
+			w-full
+			overflow-y-auto 
+			overflow-x-wrap
+			outline-none 
+			flex
+			justify-center
+			items-center
+			bg-violet-950
+			fade-in
+		"
+	>
+		<main class="block rounded-lg p-6 bg-violet-100 drop-shadow-2xl">
+			<h3 class="text-h3 font-bold">@DialogTitle</h3>
+			<h3 class="text-h3 font-bold mt-5">Are you sure want to delete the data?</h3>
+			<div class="flex gap-4 mt-5 justify-end">
+				<button type="submit" class="btn-danger" @onclick="() => OnSubmit.InvokeAsync()">Delete</button>
+				<button class="btn-primary" @onclick="() => OnCancel()" type="button">Cancel</button>
+			</div>
+		</main>
+	</div>
+}
+@code {
+	[Parameter]
+	public EventCallback OnSubmit { get; set; }
+	[Parameter]
+	public bool Show { get; set; } = false;
+	[Parameter]
+	public EventCallback<bool> ShowChanged { get; set; }
+	[Parameter]
+	public string DialogTitle { get; set; }
+
+	private async Task OnCancel()
+	{
+		Show = false;
+		await ShowChanged.InvokeAsync(false);
+	}
+}
