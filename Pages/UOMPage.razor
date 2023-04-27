@@ -2,7 +2,7 @@
 @inject IUOMRepository repository;
 @inject ToastService toastService;
 
-<BaseCrud T="UOM" @ref="baseCrud" Repository="repository">
+<Crud T="UOM" @ref="baseCrud" Repository="repository">
     <PageTitle>
 		<h3>Unit Of Measurements</h3>
     </PageTitle>
@@ -33,10 +33,10 @@
 						<td>@item.UomCode</td>
 						<td>@item.UomDesc</td>
 						<td class="flex gap-x-1">
-							<button class="btn-primary" @onclick="() => baseCrud.OnEdit(item)">
+							<button class="btn-primary" @onclick="() => baseCrud.OnEditAsync(item)">
 								Edit
 							</button>
-							<button class="btn-danger" @onclick="() => baseCrud.OnDelete(item)">
+							<button class="btn-danger" @onclick="() => baseCrud.OnDeleteAsync(item)">
 								Delete
 							</button>
 						</td>
@@ -45,8 +45,8 @@
 			</tbody>
 		</table>
     </ListView>
-</BaseCrud>
+</Crud>
 
 @code {
-	private BaseCrud<UOM> baseCrud;
+	private Crud<UOM> baseCrud;
 }

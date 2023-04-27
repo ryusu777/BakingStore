@@ -1,6 +1,116 @@
-﻿@page "/uom-conversion"
-<h3>UOMConversionPage</h3>
+﻿@page "/uom-conversion/{UomCode?}"
+@using System.Linq.Expressions;
+@inject IUOMConversionRepository repository;
+@inject IUOMRepository uomRepository;
+@inject ToastService toastService;
+
+<Crud 
+	T="UOMConversion" 
+	@ref="baseCrud" 
+	Repository="repository" 
+	Request="pageRequest"
+	OnClickCreate="ClearSelection"
+>
+    <PageTitle>
+		<h3>Unit Of Measurements Conversion List</h3>
+    </PageTitle>
+    <Form Context="input">
+		<div class="flex flex-col w-full">
+			<label>UOM Source</label>
+			<Select 
+				T="UOM" 
+				Options="uomPage.Data" 
+				OptionLabel="LabelService.UOMLabel" 
+				Label="Choose UOM" 
+				Selected="uomSrc" 
+				SelectedChanged="(e) => {
+					uomSrc = e;
+					input.Source = e?.UomCode;
+				}">
+			</Select>
+		</div>
+		<div class="flex flex-col w-full">
+			<label>UOM Destination</label>
+			<Select 
+				T="UOM" 
+				Options="uomPage.Data" 
+				OptionLabel="LabelService.UOMLabel" 
+				Label="Choose UOM" 
+				Selected="uomDest" 
+				SelectedChanged="(e) => {
+					uomDest = e;
+					input.Dest = e?.UomCode;
+				}">
+			</Select>
+		</div>
+		<div class="flex flex-col">
+			<label>Multiplier Qty</label>
+			<input @bind="input.Multiplier" />
+		</div>
+    </Form>
+
+    <ListView Context="items">
+		<table class="table-auto table-primary">
+			<thead>
+				<tr>
+					<th>UOM Source</th>
+					<th>UOM Destination</th>
+					<th>Multiplier</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (UOMConversion item in items)
+				{
+					<tr>
+						<td>@item.Source</td>
+						<td>@item.Dest</td>
+						<td>1 @item.Source = @item.Multiplier @item.Dest</td>
+						<td class="flex gap-x-1">
+							<button class="btn-primary" @onclick="() => OnEdit(item)">
+								Edit
+							</button>
+							<button class="btn-danger" @onclick="() => baseCrud.OnDeleteAsync(item)">
+								Delete
+							</button>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+    </ListView>
+</Crud>
 
 @code {
+	[Parameter]
+	public string UomCode { get; set; }
 
+	private PageRequest<UOMConversion> pageRequest = new();
+	private Crud<UOMConversion> baseCrud;
+	private UOM uomSrc;
+	private UOM uomDest;
+
+	private PageResult<UOM> uomPage;
+	private PageRequest<UOM> uomPageRequest = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (UomCode != null)
+			pageRequest.WhereClause = (e) => e.Dest == UomCode || e.Source == UomCode;
+
+		uomPage = await uomRepository.FetchPageAsync(uomPageRequest);
+	}
+
+	private async Task OnEdit(UOMConversion e)
+	{
+		uomSrc = await uomRepository.FirstOrDefaultAsync(a => a.UomCode == e.Source);
+		uomDest = await uomRepository.FirstOrDefaultAsync(a => a.UomCode == e.Dest);
+		baseCrud.OnEditAsync(e);
+	}
+
+	private void ClearSelection()
+	{
+		uomSrc = null;
+		uomDest = null;
+	}
 }

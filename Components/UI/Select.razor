@@ -6,7 +6,9 @@
 >
     <span class="w-full h-full text-left px-4 py-2.5"
 		@onclick="() => OnClick()"
-        >@(Selected != null ? OptionLabel(Selected) : Label)</span>
+	>
+        @(Selected != null ? OptionLabel(Selected) : Label)
+    </span>
     @if (Selected == null)
     {
         <div class="w-8 h-8 flex justify-center items-center mr-4" @onclick="() => OnClick()">
@@ -26,8 +28,8 @@
 
 @if (show)
 {
-	<div class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-44">
-		<ul class="py-2 text-base font-semibold">
+	<div class="z-10 divide-y divide-gray-100 w-44 relative">
+		<ul class="py-2 text-base font-semibold absolute bg-white rounded-lg shadow-lg">
 			@foreach (T item in Options)
 			{
 				<li class="block px-4 py-2 hover:bg-gray-100 cursor-pointer" 

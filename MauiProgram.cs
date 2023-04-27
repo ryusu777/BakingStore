@@ -28,6 +28,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<BakingStoreSqliteContext>();
 		builder.Services.AddTransient(typeof(SqliteCrudService<>));
 		builder.Services.AddTransient<IUOMRepository, UOMSqliteRepository>();
+		builder.Services.AddTransient<IUOMConversionRepository, UOMConversionSqliteRepository>();
 		builder.Services.AddTransient<EntityService>();
 		builder.Services.AddSingleton<ToastService>();
 		return builder.Build();

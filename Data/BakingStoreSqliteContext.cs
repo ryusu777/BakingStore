@@ -35,20 +35,30 @@ public class BakingStoreSqliteContext
         await InitDb();
         await _asyncContext.UpdateAsync(entity);
     }
-    public async Task<AsyncTableQuery<T>> Set<T>()
+    public async Task<SqliteQueryable<T>> Set<T>()
         where T : new()
     {
         await InitDb();
-        return _asyncContext.Table<T>();
+        return new SqliteQueryable<T>(_asyncContext.GetConnection().Table<T>());
     }
     async Task InitDb()
 	{
+		SQLitePCL.Batteries_V2.Init();
 		if (_asyncContext != null)
 			return;
 
 		_asyncContext = new SQLiteAsyncConnection(DbConfigurations.DatabasePath, DbConfigurations.Flags);
 		await _asyncContext.CreateTablesAsync(CreateFlags.None, 
-			typeof(UOM)
+            typeof(BakingPlan),
+            typeof(BakingPlanTopping),
+            typeof(BaseRecipe),
+            typeof(BaseRecipeIngredient),
+            typeof(DoughingAdjustment),
+            typeof(Ingredient),
+            typeof(Topping),
+            typeof(FinishingAdjustment),
+			typeof(UOM),
+            typeof(UOMConversion)
 		);
 	}
 }

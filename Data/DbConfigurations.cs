@@ -2,7 +2,7 @@
 
 public static class DbConfigurations
 {
-    public const string DatabaseFilename = "TodoSQLite.db3";
+    public const string DatabaseFilename = "TodoSQLite.db";
     public const SQLite.SQLiteOpenFlags Flags =
         // open the database in read/write mode
         SQLite.SQLiteOpenFlags.ReadWrite |

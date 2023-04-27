@@ -1,15 +1,16 @@
-﻿@inject ToastService toast;
+﻿@using System.Linq.Expressions;
+@inject ToastService toast;
 @typeparam T where T : new()
 
 @PageTitle
 
-<button class="btn-primary" @onclick="() => OnCreate()">Add</button>
+<button class="btn-primary" @onclick="() => OnCreateAsync()">Add</button>
 <Form OnSubmit="OnSubmit" @bind-Show="showDialog" OnCancel="() => input = Activator.CreateInstance<T>()" @ref="form">
     @Form(input)
 </Form>
 <DeleteDialog @bind-Show="showDeleteDialog" OnSubmit="() => DeleteAsync()" DialogTitle="Delete UOM"></DeleteDialog>
 
-@ListView(page.Data)
+@ListView(Page.Data)
 
 @code {
     [Parameter]
@@ -24,8 +25,22 @@
     [Parameter]
     public ICrudService<T> Repository { get; set; }
 
+    [Parameter]
+    public PageResult<T> Page { get; set; } = new PageResult<T>();
+
+    [Parameter]
+    public EventCallback<PageResult<T>> PageChanged { get; set; }
+
+    [Parameter]
+    public PageRequest<T> Request { get; set; } = new PageRequest<T>();
+
+    [Parameter]
+    public bool NoInitFetch { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnClickCreate { get; set; } = default(EventCallback);
+
     private Form form;
-    PageResult<T> page = new PageResult<T>();
     private T input;
     private T toDelete;
     private bool showDialog = false;
@@ -35,37 +50,42 @@
     protected override async Task OnInitializedAsync()
     {
         input = Activator.CreateInstance<T>();
-        await Fetch();
+        if (!NoInitFetch)
+            await FetchAsync();
     }
 
-    public void OnCreate()
+    public async Task OnCreateAsync()
     {
+		await OnClickCreate.InvokeAsync();
+        input = Activator.CreateInstance<T>();
         formMode = FormConstants.Create;
         showDialog = true;
     }
-    public void OnEdit(T e)
+
+    public async Task OnEditAsync(T e)
     {
         formMode = FormConstants.Edit;
-        input = e;
+        input = (T)Activator.CreateInstance(typeof(T), e);
         showDialog = true;
     }
 
-    public async Task Fetch()
+    public async Task OnDeleteAsync(T e)
+    {
+        toDelete = (T)Activator.CreateInstance(typeof(T), e);
+        showDeleteDialog = true;
+    }
+
+    public async Task FetchAsync()
     {
         try
         {
-            page = await Repository.FetchPageAsync(new PageRequest<T>());
+            Page = await Repository.FetchPageAsync(Request);
+            await PageChanged.InvokeAsync(Page);
         } 
         catch (Exception e)
         {
             toast.NotifyFailedAsync("Failed on fetching data: " + e.Message);
         }
-    }
-
-    public void OnDelete(T e)
-    {
-        toDelete = e;
-        showDeleteDialog = true;
     }
 
     public async Task DeleteAsync()
@@ -80,7 +100,7 @@
             toast.NotifyFailedAsync("Failed to delete: " + e.Message);
         }
 
-        await Fetch();
+        await FetchAsync();
         showDeleteDialog = false;
     }
 
@@ -106,7 +126,7 @@
         {
             toast.NotifyFailedAsync("Failed to edit: " + e.Message);
         }
-        await Fetch();
+        await FetchAsync();
     }
 
     public async Task AddAsync()
@@ -120,6 +140,6 @@
         {
             toast.NotifyFailedAsync("Failed to add: " + e.Message);
         }
-        await Fetch();
+        await FetchAsync();
     }
 }
