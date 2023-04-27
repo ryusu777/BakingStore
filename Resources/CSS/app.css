@@ -32,13 +32,16 @@
 
 @layer components {
     .btn-default {
-        @apply py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none;
+        @apply py-1.5 px-2 text-white font-semibold rounded-lg shadow-md focus:outline-none;
     }
     .btn-primary {
-        @apply btn-default hover:bg-blue-700 bg-blue-500;
+        @apply btn-default hover:bg-violet-700 bg-violet-400;
     }
     .btn-danger {
-        @apply btn-default hover:bg-red-700 bg-red-500;
+        @apply btn-default hover:bg-rose-700 bg-rose-400;
+    }
+    .btn-icon {
+        @apply rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 flex justify-center items-center h-9 w-9 m-0;
     }
 }
 
@@ -111,12 +114,6 @@ h1:focus {
 
 a, .btn-link {
     color: #0071c1;
-}
-
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
 }
 
 .content {

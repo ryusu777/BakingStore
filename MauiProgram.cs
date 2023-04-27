@@ -11,6 +11,7 @@ public static class MauiProgram
 	public static MauiApp CreateMauiApp()
 	{
 		var builder = MauiApp.CreateBuilder();
+		SQLitePCL.Batteries_V2.Init();
 		builder
 			.UseMauiApp<App>()
 			.ConfigureFonts(fonts =>
@@ -27,6 +28,8 @@ public static class MauiProgram
 
 		builder.Services.AddTransient<BakingStoreSqliteContext>();
 		builder.Services.AddTransient(typeof(SqliteCrudService<>));
+		builder.Services.AddTransient<IIngredientRepository, IngredientSqliteRepository>();
+		builder.Services.AddTransient<IToppingRepository, ToppingSqliteRepository>();
 		builder.Services.AddTransient<IUOMRepository, UOMSqliteRepository>();
 		builder.Services.AddTransient<IUOMConversionRepository, UOMConversionSqliteRepository>();
 		builder.Services.AddTransient<EntityService>();

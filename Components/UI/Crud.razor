@@ -5,7 +5,13 @@
 @PageTitle
 
 <button class="btn-primary" @onclick="() => OnCreateAsync()">Add</button>
-<Form OnSubmit="OnSubmit" @bind-Show="showDialog" OnCancel="() => input = Activator.CreateInstance<T>()" @ref="form">
+<Form 
+    OnSubmit="OnSubmit" 
+    @bind-Show="showDialog" 
+    OnCancel="() => input = Activator.CreateInstance<T>()" 
+    @ref="form"
+    Title="@formTitle"
+>
     @Form(input)
 </Form>
 <DeleteDialog @bind-Show="showDeleteDialog" OnSubmit="() => DeleteAsync()" DialogTitle="Delete UOM"></DeleteDialog>
@@ -40,12 +46,16 @@
     [Parameter]
     public EventCallback OnClickCreate { get; set; } = default(EventCallback);
 
+    [Parameter]
+    public string EntityName { get; set; } = nameof(T);
+
     private Form form;
     private T input;
     private T toDelete;
     private bool showDialog = false;
     private bool showDeleteDialog = false;
     private FormConstants formMode = FormConstants.Create;
+    private string formTitle;
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,9 +66,10 @@
 
     public async Task OnCreateAsync()
     {
-		await OnClickCreate.InvokeAsync();
+        await OnClickCreate.InvokeAsync();
         input = Activator.CreateInstance<T>();
         formMode = FormConstants.Create;
+        formTitle = "Add " + EntityName;
         showDialog = true;
     }
 
@@ -66,6 +77,7 @@
     {
         formMode = FormConstants.Edit;
         input = (T)Activator.CreateInstance(typeof(T), e);
+        formTitle = "Edit " + EntityName;
         showDialog = true;
     }
 
@@ -111,8 +123,8 @@
         else if (formMode == FormConstants.Edit)
             await EditAsync();
 
-        input = Activator.CreateInstance<T>();
         await form.Hide();
+        input = Activator.CreateInstance<T>();
     }
 
     public async Task EditAsync()

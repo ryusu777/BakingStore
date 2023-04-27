@@ -1,45 +1,47 @@
 ﻿@typeparam T
 
-<button 
-    class="flex justify-between text-slate-600 bg-violet-100 hover:bg-violet-200 focus:ring-2 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-base text-center inline-flex items-center w-full"
-    type="button"
->
-    <span class="w-full h-full text-left px-4 py-2.5"
-		@onclick="() => OnClick()"
+<div class="flex flex-col @Class">
+	<button 
+		class="flex justify-between text-slate-600 bg-violet-100 hover:bg-violet-200 focus:ring-2 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-base text-center inline-flex items-center w-full"
+		type="button"
 	>
-        @(Selected != null ? OptionLabel(Selected) : Label)
-    </span>
-    @if (Selected == null)
-    {
-        <div class="w-8 h-8 flex justify-center items-center mr-4" @onclick="() => OnClick()">
-			<svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </div>
-    }
-    else 
-    {
-        <button 
-            @onclick="async () => await OnDeselect()"
-            type="button" 
-            class="bg-violet-100 text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 mr-2.5">
-			<svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-		</button>
-    }
-</button>
+		<span class="w-full h-full text-left px-4 py-2.5"
+			@onclick="() => OnClick()"
+		>
+			@(Selected != null ? OptionLabel(Selected) : Label)
+		</span>
+		@if (Selected == null)
+		{
+			<div class="w-8 h-8 flex justify-center items-center mr-4" @onclick="() => OnClick()">
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+			</div>
+		}
+		else 
+		{
+			<button 
+				@onclick="async () => await OnDeselect()"
+				type="button" 
+				class="bg-violet-100 text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 mr-2.5">
+				<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+			</button>
+		}
+	</button>
 
-@if (show)
-{
-	<div class="z-10 divide-y divide-gray-100 w-44 relative">
-		<ul class="py-2 text-base font-semibold absolute bg-white rounded-lg shadow-lg">
-			@foreach (T item in Options)
-			{
-				<li class="block px-4 py-2 hover:bg-gray-100 cursor-pointer" 
-                    @onclick="async () => await OnSelect(item)">
-					@OptionLabel(item)
-				</li>
-			}
-		</ul>
-	</div>
-}
+	@if (show)
+	{
+		<div class="z-10 divide-y divide-gray-100 w-44 relative">
+			<ul class="py-2 text-base font-semibold absolute bg-white rounded-lg shadow-lg">
+				@foreach (T item in Options)
+				{
+					<li class="block px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+						@onclick="async () => await OnSelect(item)">
+						@OptionLabel(item)
+					</li>
+				}
+			</ul>
+		</div>
+	}
+</div>
 
 @code {
     [Parameter]
@@ -56,6 +58,9 @@
 
     [Parameter]
     public EventCallback<T> SelectedChanged { get; set; }
+
+	[Parameter]
+	public string Class { get; set;}
 
     private bool show = false;
 

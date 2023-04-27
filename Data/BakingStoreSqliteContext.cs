@@ -43,7 +43,6 @@ public class BakingStoreSqliteContext
     }
     async Task InitDb()
 	{
-		SQLitePCL.Batteries_V2.Init();
 		if (_asyncContext != null)
 			return;
 

@@ -1,0 +1,98 @@
+﻿@page "/ingredient"
+@using System.Linq.Expressions;
+@inject IIngredientRepository repository;
+@inject IUOMRepository uomRepository;
+@inject ToastService toastService;
+
+<Crud 
+	T="Ingredient" 
+	@ref="baseCrud" 
+	Repository="repository" 
+	Request="pageRequest"
+	OnClickCreate="ClearSelection"
+>
+    <PageTitle>
+		<h3 class="text-h2">Ingredient List</h3>
+    </PageTitle>
+    <Form Context="input">
+		<div class="flex flex-col w-full">
+			<label>Ingredient Name</label>
+			<input @bind="input.Name" />
+		</div>
+		<div class="flex flex-col w-full">
+			<label>Available stock</label>
+			<div class="flex w-full">
+				<input @bind="input.AvailableStock" type="number" />
+				<Select 
+					Class="ml-2"
+					T="UOM" 
+					Options="uomPage.Data" 
+					OptionLabel="LabelService.UOMLabel" 
+					Label="Choose UOM"
+					Selected="selectedUom" 
+					SelectedChanged="(e) => {
+						selectedUom = e;
+						input.UomCode = e?.UomCode;
+					}">
+				</Select>
+			</div>
+		</div>
+    </Form>
+
+    <ListView Context="items">
+		<table class="table-auto table-primary">
+			<thead>
+				<tr>
+					<th>Ingredient Name</th>
+					<th>UOM</th>
+					<th>AvailableStock</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (Ingredient item in items)
+				{
+					<tr>
+						<td>@item.Name</td>
+						<td>@item.UomCode</td>
+						<td>@item.AvailableStock @item.UomCode</td>
+						<td class="flex gap-x-1">
+							<EditButton @onclick="() => OnEdit(item)" />
+							<DeleteButton @onclick="() => baseCrud.OnDeleteAsync(item)" />
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+    </ListView>
+</Crud>
+
+@code {
+	[Parameter]
+	public string UomCode { get; set; }
+
+	private PageRequest<Ingredient> pageRequest = new();
+	private Crud<Ingredient> baseCrud;
+	private UOM selectedUom;
+	private UOM uomDest;
+
+	private PageResult<UOM> uomPage;
+	private PageRequest<UOM> uomPageRequest = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		uomPage = await uomRepository.FetchPageAsync(uomPageRequest);
+	}
+
+	private async Task OnEdit(Ingredient e)
+	{
+		selectedUom = await uomRepository.FirstOrDefaultAsync(a => a.UomCode == e.UomCode);
+		await baseCrud.OnEditAsync(e);
+	}
+
+	private void ClearSelection()
+	{
+		selectedUom = null;
+		uomDest = null;
+	}
+}

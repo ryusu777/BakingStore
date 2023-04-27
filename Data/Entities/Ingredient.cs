@@ -11,12 +11,12 @@ public class Ingredient
     {
         Id = src.Id;
         Name = src.Name;
-        UOMCode = src.UOMCode;
+        UomCode = src.UomCode;
         AvailableStock = src.AvailableStock;
     }
     [PrimaryKey]
     public int Id { get; set; }
     public string Name { get; set; }
-    public string UOMCode { get; set; }
+    public string UomCode { get; set; }
     public float AvailableStock { get; set; }
 }
