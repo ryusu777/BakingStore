@@ -2,17 +2,18 @@
 
 namespace BakingStore.Data.Entities;
 
-public class UOM
+public class UOM : BaseEntity
 {
 	public UOM()
 	{
 	}
-	public UOM(UOM src)
+	public UOM(UOM src) 
+		: base(src)
 	{
 		UomCode = src.UomCode;
 		UomDesc = src.UomDesc;
 	}
-    [PrimaryKey]
+	[Indexed]
     public string UomCode { get; set; }
     public string UomDesc { get; set; }
 }

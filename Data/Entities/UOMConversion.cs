@@ -2,21 +2,21 @@
 
 namespace BakingStore.Data.Entities;
 
-public class UOMConversion
+public class UOMConversion : BaseEntity
 {
 	public UOMConversion()
 	{
 	}
-	public UOMConversion(UOMConversion src)
+	public UOMConversion(UOMConversion src) 
+		: base(src)
 	{
 		Source = src.Source;
 		Dest = src.Dest;
 		Multiplier = src.Multiplier;
 	}
-
-	[PrimaryKey]
+	[Indexed]
 	public string Source { get; set; }
-	[PrimaryKey]
+	[Indexed]
 	public string Dest { get; set; }
 	public float Multiplier { get; set; }
 }

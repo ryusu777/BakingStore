@@ -2,20 +2,21 @@
 
 namespace BakingStore.Data.Entities;
 
-public class BaseRecipeIngredient
+public class BaseRecipeIngredient : BaseEntity
 {
     public BaseRecipeIngredient()
     {
     }
     public BaseRecipeIngredient(BaseRecipeIngredient src)
+        : base(src)
     {
         BaseRecipeId = src.BaseRecipeId;
         IngredientId = src.IngredientId;
         IngredientQty = src.IngredientQty;
     }
-    [PrimaryKey]
+    [Indexed]
     public int BaseRecipeId { get; set; }
-    [PrimaryKey]
+    [Indexed]
     public int IngredientId { get; set; }
     public float IngredientQty { get; set; }
 }

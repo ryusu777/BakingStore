@@ -1,0 +1,86 @@
+﻿@inject IBaseRecipeIngredientRepository repository;
+@inject IIngredientRepository ingredientRepository;
+
+@if (Show) 
+{
+<tr>
+	<td colspan="3">
+		<div class="flex flex-col">
+			<div class="flex justify-between">
+				<p>Recipe Ingredients</p>
+				<button class="btn-primary" @onclick="() => OnCreateClick()">Add</button>
+			</div>
+			@if (page.Data.Count == 0)
+			{
+				<div>No data found</div>
+			}
+
+			@foreach (BaseRecipeIngredient item in page.Data)
+			{
+				<div>
+					@item.IngredientId - @item.IngredientQty
+				</div>
+			}
+
+			@if (showForm)
+			{
+				<div class="flex justify-even">
+					<Select 
+						T="Ingredient" 
+						Options="ingredientPage.Data"
+						OptionLabel="LabelService.IngredientLabel" 
+						Label="Choose Ingredient" 
+						Selected="selectedIngredient" 
+						SelectedChanged="(e) => {
+							selectedIngredient = e;
+							input.IngredientId = e.Id;
+						}">
+					</Select>
+					<input @bind="input.IngredientQty" type="number" />
+					<button type="button" class="btn-primary" @onclick="async () => await OnSubmitAsync()">Submit</button>
+				</div>
+			}
+		</div>
+	</td>
+</tr>
+}
+
+@code {
+	[Parameter]
+	public bool Show { get; set; }
+
+	[Parameter]
+	public BaseRecipe BaseRecipe { get; set; }
+
+	private bool showForm = false;
+	private BaseRecipeIngredient input = new();
+	private PageRequest<BaseRecipeIngredient> pageRequest = new PageRequest<BaseRecipeIngredient>();
+	private PageResult<BaseRecipeIngredient> page = new PageResult<BaseRecipeIngredient>();
+
+	private PageResult<Ingredient> ingredientPage;
+	private Ingredient selectedIngredient;
+
+	protected override void OnParametersSet()
+	{
+		pageRequest.WhereClause = (e) => e.BaseRecipeId == BaseRecipe.Id;
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		page = await repository.FetchPageAsync(pageRequest);
+	}
+
+	private async Task OnCreateClick()
+	{
+		ingredientPage = await ingredientRepository.FetchPageAsync(new PageRequest<Ingredient>());
+		showForm = true;
+	}
+
+	private async Task OnSubmitAsync()
+	{
+		await repository.AddAsync(input);
+		await repository.FetchPageAsync(pageRequest);
+		input = new();
+		showForm = false;
+	}
+}
