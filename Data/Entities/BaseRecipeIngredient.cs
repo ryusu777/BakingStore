@@ -19,4 +19,7 @@ public class BaseRecipeIngredient : BaseEntity
     [Indexed]
     public int IngredientId { get; set; }
     public float IngredientQty { get; set; }
+
+    [Ignore]
+    public Ingredient Ingredient { get; set; }
 }

@@ -10,8 +10,8 @@ namespace BakingStore.Services;
 public class SqliteCrudService<T> : ICrudService<T>
     where T : new()
 {
-    BakingStoreSqliteContext _context;
-    EntityService _entityService;
+    protected BakingStoreSqliteContext _context;
+    protected EntityService _entityService;
     public SqliteCrudService(BakingStoreSqliteContext context, EntityService entityService)
     {
         _context = context;

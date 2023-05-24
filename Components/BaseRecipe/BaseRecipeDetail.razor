@@ -10,15 +10,15 @@
 				<p>Recipe Ingredients</p>
 				<button class="btn-primary" @onclick="() => OnCreateClick()">Add</button>
 			</div>
-			@if (page.Data.Count == 0)
+			@if (page.Count == 0)
 			{
 				<div>No data found</div>
 			}
 
-			@foreach (BaseRecipeIngredient item in page.Data)
+			@foreach (BaseRecipeIngredient item in page)
 			{
 				<div>
-					@item.IngredientId - @item.IngredientQty
+					@item.Ingredient.Name - @item.IngredientQty
 				</div>
 			}
 
@@ -52,22 +52,25 @@
 	[Parameter]
 	public BaseRecipe BaseRecipe { get; set; }
 
+	private int baseRecipeId;
 	private bool showForm = false;
 	private BaseRecipeIngredient input = new();
 	private PageRequest<BaseRecipeIngredient> pageRequest = new PageRequest<BaseRecipeIngredient>();
-	private PageResult<BaseRecipeIngredient> page = new PageResult<BaseRecipeIngredient>();
+	private ICollection<BaseRecipeIngredient> page = new List<BaseRecipeIngredient>();
 
 	private PageResult<Ingredient> ingredientPage;
 	private Ingredient selectedIngredient;
 
-	protected override void OnParametersSet()
+	protected override async Task OnParametersSetAsync()
 	{
 		pageRequest.WhereClause = (e) => e.BaseRecipeId == BaseRecipe.Id;
+		baseRecipeId = BaseRecipe.Id;
+		await FetchPageAsync();
 	}
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	private async Task FetchPageAsync()
 	{
-		page = await repository.FetchPageAsync(pageRequest);
+		page = await repository.FetchJoinPageAsync(BaseRecipe.Id);
 	}
 
 	private async Task OnCreateClick()
@@ -79,7 +82,7 @@
 	private async Task OnSubmitAsync()
 	{
 		await repository.AddAsync(input);
-		await repository.FetchPageAsync(pageRequest);
+		await repository.FetchJoinPageAsync(BaseRecipe.Id);
 		input = new();
 		showForm = false;
 	}
