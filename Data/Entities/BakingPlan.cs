@@ -15,4 +15,6 @@ public class BakingPlan : BaseEntity
     }
     public int BaseRecipeId { get; set; }
     public DateTime BakingDate { get; set; }
+    [Ignore]
+    public BaseRecipe Recipe { get; set; }
 }

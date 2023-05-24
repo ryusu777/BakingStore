@@ -1,0 +1,91 @@
+﻿@inject IBakingPlanToppingRepository repository;
+@inject IToppingRepository toppingrepository;
+
+
+<h1>Topping List</h1>
+
+@if (Show)
+{
+	<tr>
+		<td colspan="3">
+			<div class="flex flex-col">
+				<div class="flex justify-between">
+					<p>Topping List</p>
+					<button class="btn-primary" @onclick="() => OnCreateClick()">Add</button>
+				</div>
+				@if (page.Count == 0)
+				{
+					<div>No data found</div>
+				}
+
+				@foreach (BakingPlanTopping item in page)
+				{
+					<div>
+						@item.Topping.Name - @item.Qty
+					</div>
+				}
+
+				@if (showForm)
+				{
+					<div class="flex justify-even">
+						<Select T="Topping"
+						Options="toppingPage.Data"
+						OptionLabel="LabelService.ToppingLabel"
+						Label="Choose Topping"
+						Selected="selectedTopping"
+						SelectedChanged="(e) => {
+							selectedTopping = e;
+							input.ToppingId = e.Id;
+						}">
+						</Select>
+						<button type="button" class="btn-primary" @onclick="async () => await OnSubmitAsync()">Submit</button>
+					</div>
+				}
+			</div>
+		</td>
+	</tr>
+}
+
+
+@code {
+	[Parameter]
+	public bool Show { get; set; }
+
+	[Parameter]
+	public Topping Topping { get; set; }
+
+	private int bakingPlanId;
+	private bool showForm = false;
+	private BakingPlanTopping input = new();
+	private PageRequest<BakingPlanTopping> pageRequest = new PageRequest<BakingPlanTopping>();
+	private ICollection<BakingPlanTopping> page = new List<BakingPlanTopping>();
+
+	private PageResult<Topping> toppingPage;
+	private Topping selectedTopping;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		pageRequest.WhereClause = (e) => e.BakingPlanId == Topping.Id;
+		bakingPlanId = Topping.Id;
+		await FetchPageAsync();
+	}
+
+	private async Task FetchPageAsync()
+	{
+		page = await repository.FetchJoinPageAsync(Topping.Id);
+	}
+
+	private async Task OnCreateClick()
+	{
+		ingredientPage = await toppingrepository.FetchPageAsync(new PageRequest<Topping>());
+		showForm = true;
+	}
+
+	private async Task OnSubmitAsync()
+	{
+		await repository.AddAsync(input);
+		await repository.FetchJoinPageAsync(Topping.Id);
+		input = new();
+		showForm = false;
+	}
+}

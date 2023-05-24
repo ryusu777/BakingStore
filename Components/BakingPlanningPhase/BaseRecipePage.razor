@@ -1,0 +1,64 @@
+﻿@page "/baserecipe"
+@using System.Linq.Expressions;
+@using BakingStore.Components.BaseRecipe
+@inject IBaseRecipeRepository repository;
+@inject IUOMRepository uomRepository;
+@inject ToastService toastService;
+
+<Crud T="BaseRecipe"
+	  @ref="baseCrud"
+	  Repository="repository"
+	  Request="pageRequest">
+	<PageTitle>
+		<h2 class="text-h2">BaseRecipe List</h2>
+		<div class="my-2"></div>
+	</PageTitle>
+	<Form Context="input">
+		<div class="flex flex-col w-full">
+			<label>Recipe Name</label>
+			<input @bind="input.Name" />
+		</div>
+		<div class="flex flex-col w-full">
+			<label>Expected Product Result Quantity</label>
+			<input @bind="input.ProductResultQty" type="number" />
+		</div>
+	</Form>
+
+	<ListView Context="items">
+		<table class="table-auto table-primary">
+			<thead>
+				<tr>
+					<th class="text-center">Recipe Name</th>
+					<th class="text-center">Expected Qty</th>
+					<th class="text-center">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (BaseRecipe item in items)
+				{
+					<tr>
+						<td class="text-center">@item.Name</td>
+						<td class="text-center">@item.ProductResultQty</td>
+						<td class="text-center">
+							<button class="btn-primary" @onclick="() => ToggleDetail(item)">Change Recipe</button>
+							<button class="btn-primary" @onclick="() => baseCrud.OnEditAsync(item)">Modify Recipe</button>
+							<button class="btn-primary" @onclick="() => baseCrud.OnDeleteAsync(item)">Delete Recipe</button>
+							@*<EditButton @onclick="() => baseCrud.OnEditAsync(item)" />
+							<DeleteButton @onclick="() => baseCrud.OnDeleteAsync(item)" />*@
+						</td>
+					</tr>
+					<BaseRecipeDetail BaseRecipe="item" Show="item.ShowDetail" />
+				}
+			</tbody>
+		</table>
+	</ListView>
+</Crud>
+
+@code {
+	private PageRequest<BaseRecipe> pageRequest = new();
+	private Crud<BaseRecipe> baseCrud;
+	private void ToggleDetail(BaseRecipe e)
+	{
+		e.ShowDetail = !e.ShowDetail;
+	}
+}

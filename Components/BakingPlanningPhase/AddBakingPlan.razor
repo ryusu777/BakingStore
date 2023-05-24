@@ -1,0 +1,57 @@
+﻿@page "/addbakingplan"
+@using System.Linq.Expressions;
+@inject IBaseRecipeRepository repository;
+@inject IUOMRepository uomRepository;
+@inject ToastService toastService;
+
+<PageTitle>
+    <h3 class="text-h2">Recipe List</h3>
+</PageTitle>
+<Form Context="input">
+	<Select Class="ml-2"
+			T="BaseRecipe"
+			Options="baserecipelanPage.Data"
+			OptionLabel="(e) => e.Name"
+			Label="Choose Recipe"
+			Selected="selectedRecipe"
+			SelectedChanged="(e) => {
+				selectedRecipe = e;
+				input.Name = e?.Name;
+			}">
+	</Select>
+</Form>
+<ListView Context="items">
+		<table class="table-auto table-primary">
+			<thead>
+				<tr>
+					<th>Topping Name</th>
+					<th>AvailableStock</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (BaseRecipe item in items)
+				{
+					<tr>
+						<td>@item.Name</td>
+						<td>@item.ExpectedQty</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+    </ListView>
+
+@code {
+	[Parameter]
+	public string Name { get; set; }
+
+	private PageRequest<BaseRecipe> pageRequest = new();
+	private BaseRecipe selectedRecipe;
+
+	private PageResult<BaseRecipe> baserecipelanPage;
+	private PageRequest<BaseRecipe> baserecipePageRequest = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		baserecipelanPage = await repository.FetchPageAsync(baserecipePageRequest);
+	}
+}

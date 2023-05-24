@@ -1,0 +1,49 @@
+﻿@page "/doughing/{Date?}"
+@inject IBakingPlanRepository planRepository;
+
+<h3>DoughingAdjustmentPage</h3>
+
+@foreach (BakingPlan plan in plans)
+{
+	<div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg mb-5">
+		<h1 class="mb-2 text-xl font-bold tracking-tight text-gray-900">@plan.Recipe.Name @(plan.Recipe.ProductResultQty)x</h1>
+		
+		<h1 class="mb-2 text-md font-bold tracking-tight text-gray-900">Ingredients</h1>
+		@foreach (BaseRecipeIngredient ingredient in plan.Recipe?.Ingredients)
+		{
+			<div class="max-w-sm p-3 bg-violet-100 border border-gray-200 rounded-lg mb-2 flex flex-row justify-between items-center">
+				<p class="text-sm font-bold tracking-tight text-gray-900">@ingredient.Ingredient.Name @ingredient.IngredientQty @ingredient.Ingredient.UomCode</p>
+				<EditButton />
+			</div>
+		}
+		<button 
+			type="button" 
+			class="btn btn-primary">
+			Add Ingredient
+		</button>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public string? Date { get; set; }
+
+	private DateTime bakingDateRequest { get; set; }
+	private ICollection<BakingPlan> plans = new List<BakingPlan>();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		base.OnParametersSet();
+		if (Date != null)
+			bakingDateRequest = DateTime.Parse(Date);
+		else
+			bakingDateRequest = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
+		plans = await planRepository.FetchBakingPlaningData(bakingDateRequest);
+		StateHasChanged();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+	}
+}

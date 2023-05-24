@@ -1,4 +1,5 @@
 ﻿using BakingStore.Data.Entities;
+using BakingStore.Data.Views;
 using BakingStore.Interfaces;
 using BakingStore.Repositories.Sqlite;
 using SQLite;
@@ -56,6 +57,7 @@ public class BakingStoreSqliteContext
 
 		_asyncContext = new SQLiteAsyncConnection(DbConfigurations.DatabasePath, DbConfigurations.Flags);
         await _asyncContext.ExecuteAsync("CREATE VIEW IF NOT EXISTS VBaseRecipeIngredient AS SELECT b.Id, b.BaseRecipeId, b.IngredientId, b.IngredientQty, i.Name as IngredientName, i.UomCode, i.AvailableStock FROM BaseRecipeIngredient b JOIN Ingredient i ON b.IngredientId = i.Id;");
+        await _asyncContext.ExecuteAsync("CREATE VIEW IF NOT EXISTS VBakingPlanTopping AS SELECT b.*, t.Name AS ToppingName, t.UomCode AS ToppingUomCode, t.AvailableStock AS ToppingAvailableStock FROM BakingPlanTopping b JOIN Topping t ON b.ToppingId = t.Id;");
 		await _asyncContext.CreateTablesAsync(CreateFlags.None, 
             typeof(BakingPlan),
             typeof(BakingPlanTopping),
@@ -67,7 +69,8 @@ public class BakingStoreSqliteContext
             typeof(FinishingAdjustment),
 			typeof(UOM),
             typeof(UOMConversion),
-            typeof(VBaseRecipeIngredient)
+            typeof(VBaseRecipeIngredient),
+            typeof(VBakingPlanTopping)
 		);
 	}
 }

@@ -19,4 +19,7 @@ public class BakingPlanTopping : BaseEntity
     [Indexed]
     public int ToppingId { get; set; }
     public int Qty { get; set; }
+
+    [Ignore]
+    public Topping Topping { get; set; }
 }

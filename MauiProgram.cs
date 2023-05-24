@@ -34,6 +34,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<IUOMConversionRepository, UOMConversionSqliteRepository>();
 		builder.Services.AddTransient<IBaseRecipeRepository, BaseRecipeSqliteRepository>();
 		builder.Services.AddTransient<IBaseRecipeIngredientRepository, BaseRecipeIngredientSqliteRepository>();
+		builder.Services.AddTransient<IBakingPlanRepository, BakingPlanSqliteRepository>();
 		builder.Services.AddTransient<EntityService>();
 		builder.Services.AddSingleton<ToastService>();
 		return builder.Build();
